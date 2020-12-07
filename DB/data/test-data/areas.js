@@ -1,93 +1,83 @@
 const axios = require('axios');
+const { push } = require('./users');
+
+const tierAreas = {areas: [
+
+]
 
 
-
-const Areas = [
-{
-    area: 'North Yorkshire',
-    districts: [
-
-],
-tier: 'tier2'
-
-}]
-
+}
 
 axios.get("https://opendata.camden.gov.uk/resource/g3bz-7ur8.json")
 .then((result)=> {
 
+            // adds areas to tierareas
+            const removeDuplicates = result.data.filter((area, idx, same) =>
+            idx === same.findIndex((a) => (
+                a.county_name === area.county_name 
+              )
+            )) 
+            const pushAreas = removeDuplicates.map(area => {
+                return area.county_name
+            })
 
-    for(i=0; i<result.data.length; i++) {
-        
-        for(j=0; j<Areas.length; j++){
-            if (result.data[i].county_name === Areas[j].area){
-               Areas[j].districts.push({name: result.data[i].local_authority_name, postcodes: [result.data[i].postcode_1]})
+            for (let i=0; i<pushAreas.length; i++) {
+                if(pushAreas[i] !== '(pseudo) Scotland' && 
+                   pushAreas[i] !== '(pseudo) England (UA/MD/LB)' && 
+                   pushAreas[i] !== '(pseudo) England' && 
+                   pushAreas[i] !== '(pseudo) Northern Ireland' && 
+                   pushAreas[i] !== '(pseudo) Wales' 
+                   ){
+                tierAreas.areas.push({name: pushAreas[i], localAuthorites: []})
+                }
             }
-        }
-    }    
-/*
-    for (let k=0; k<Areas.length;k++){
-        Areas[k].districts = Areas[k].districts.filter((area, idx, same) =>
-        idx === same.findIndex((a) => (
-            a.name === area.name 
-          ))
-        )
-    }
- */   
-    console.log(Areas[0].districts)
+            //-------------------------
+            // adds local authorities to areas
+            const removeDuplicateAuthorities = result.data.filter((localAut, idx, same) =>
+            idx === same.findIndex((la) => (
+                localAut.local_authority_name === la.local_authority_name 
+              )
+            )) 
+            const localAuthorityArr = removeDuplicateAuthorities.map(area => {
+            
+                for(let j = 0; j<tierAreas.areas.length; j++) {
+                    
+                    if(area.county_name === tierAreas.areas[j].name) {
+                        tierAreas.areas[j].localAuthorites.push({name: area.local_authority_name, postcodes:[]})
+                    }
+                }
+            });
+            //---------------------------------
+            //adds postcodes to localAuthority
+
+            const addPostcodestoAuthority = result.data.map(area => {
+                for(let k = 0; k<tierAreas.areas.length; k++) {
+                    for(let l = 0; l<tierAreas.areas[k].localAuthorites.length; l++){
+                        console.log(tierAreas.areas[k],areas.)
+                    if(area.local_authority_name === tierAreas.areas[k].name){
+                        tierAreas.areas[k].localAuthorites[l].postcodes.push(area.postcode_3)
+                        }
+                    }
+                } 
+            })
+
+
+
+
+
+             
+
+
+            
+
+            console.log(tierAreas.areas[15].localAuthorites[1].postcodes)
+           // console.log(result.data)
+         
+         
+        
+        
+
+        
+    
+
 });
-
-
-
-
-
-
-
-
-
-
-/*
-
-
-const Areas = [
-{
-    area: 'North Yorkshire',
-    districts: [
-        {Name: 'Craven', postcodes: []},
-        {Name: 'Richmondshire', postcodes: []},
-        {Name: 'Harrogate', postcodes: ['YIO 475']},
-        {Name: 'Hambleton', postcodes: []},
-        {Name: 'Ryedale', postcodes: []},
-        {Name: 'Scarborough', postcodes: []},
-        {Name: 'Selby', postcodes: []}
-],
-tier: 2
-
-},
-{
-    area: 'Kent', 
-    districts: [
-        {name: 'Folkestone and Hythe', postcodes: []},
-        {name: 'Dover', postcodes: []},
-        {name: 'Thanet', postcodes: []},
-        {name: 'Canterbury', postcodes: []},
-        {name: 'Ashford', postcodes: []},
-        {name: 'Tunbridge Wells', postcodes: []},
-        {name: 'Maidstone', postcodes: []},
-        {name: 'Swale', postcodes: []},
-        {name: 'Tonbridge & Malling', postcodes: []},
-        {name: 'Sevenoaks', postcodes: []},
-        {name: 'Dartford', postcodes: []},
-        {name: 'Gavesham', postcodes: []},
-],
-    tier: 3
-},
-
-{
-    area: 'Cornwall and Isles of Scilly', 
-    districts: [
-        {name:'Cornwall and Isles of Scilly', postcodes: []}
-    ],
-    tier: 1
-}
-]*/
