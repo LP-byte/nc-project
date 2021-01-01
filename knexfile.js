@@ -14,12 +14,12 @@ const baseConfig = {
 const customConfig = {
   development: {
     connection: {
-      database: 'nc-project',
+      database: 'can_i_covid_api',
     },
   },
   test: {
     connection: {
-      database: 'nc-project-test',
+      database: 'can_i_covid_api_test',
     },
   },
   production: {
